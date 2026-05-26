@@ -1,0 +1,89 @@
+.expense-list-empty {
+  text-align: center;
+  color: #95a5a6;
+  padding: 30px;
+  font-size: 0.95rem;
+}
+
+.expense-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.expense-table th {
+  text-align: left;
+  padding: 10px 12px;
+  background: #f8f9fa;
+  color: #666;
+  font-weight: 600;
+  border-bottom: 2px solid #ecf0f1;
+}
+
+.expense-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.expense-table tr:last-child td {
+  border-bottom: none;
+}
+
+.expense-table tr:hover td {
+  background: #fafafa;
+}
+
+.date-col {
+  white-space: nowrap;
+  color: #666;
+}
+
+.store-col {
+  color: #666;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.amount-col {
+  text-align: right;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.category-badge {
+  display: inline-block;
+  color: white;
+  font-size: 0.78rem;
+  padding: 3px 9px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #bdc3c7;
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.delete-btn:hover {
+  color: #e74c3c;
+  background: #fef0f0;
+}
+
+@media (max-width: 600px) {
+  .store-col {
+    display: none;
+  }
+
+  .expense-table th:nth-child(2) {
+    display: none;
+  }
+}
