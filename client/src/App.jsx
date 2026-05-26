@@ -22,6 +22,9 @@ function App() {
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   });
 
+  // バリデーション警告メッセージ（複数対応）
+  const [warnings, setWarnings] = useState([]);
+
   // expenses が変わるたびに localStorage に保存
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
@@ -29,6 +32,29 @@ function App() {
 
   // レシート解析結果を支出データに追加する
   const handleReceiptAnalyzed = (receiptData) => {
+    const newWarnings = [];
+
+    // 【検証1】負の金額チェック
+    const negativeItems = receiptData.items.filter((item) => item.amount < 0);
+    if (negativeItems.length > 0) {
+      const names = negativeItems.map((i) => i.name).join('、');
+      newWarnings.push(`負の金額が含まれています（${names}）。値引き・返品の可能性があります。`);
+    }
+
+    // 【検証2】重複レシートチェック（同一日付・合計金額）
+    // 各 expense に receiptTotal を保持しているので、それと照合する
+    const isDuplicate = expenses.some(
+      (e) => e.date === receiptData.date && e.receiptTotal === receiptData.total
+    );
+    if (isDuplicate) {
+      newWarnings.push(
+        `同じ日付・合計金額のレシートが既に登録されています（${receiptData.date}、¥${receiptData.total.toLocaleString()}）。重複登録の可能性があります。`
+      );
+    }
+
+    setWarnings(newWarnings);
+
+    // 警告があっても登録は続行する（ユーザーが確認できるように）
     const newExpenses = receiptData.items.map((item, index) => ({
       id: `${Date.now()}-${index}`,
       date: receiptData.date,
@@ -36,6 +62,8 @@ function App() {
       name: item.name,
       amount: item.amount,
       category: item.category,
+      // 重複検知に使うレシート合計を各アイテムに付与
+      receiptTotal: receiptData.total,
     }));
     setExpenses((prev) => [...prev, ...newExpenses]);
   };
@@ -74,6 +102,27 @@ function App() {
         <section className="section">
           <ReceiptUpload onAnalyzed={handleReceiptAnalyzed} />
         </section>
+
+        {/* バリデーション警告バナー */}
+        {warnings.length > 0 && (
+          <div className="warning-banner" role="alert">
+            <div className="warning-banner-header">
+              <span>⚠ 登録時の注意</span>
+              <button
+                className="warning-close-btn"
+                onClick={() => setWarnings([])}
+                aria-label="警告を閉じる"
+              >
+                ✕
+              </button>
+            </div>
+            <ul className="warning-list">
+              {warnings.map((msg, i) => (
+                <li key={i}>{msg}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* グラフセクション */}
         {filteredExpenses.length > 0 && (
